@@ -24,13 +24,71 @@ async function createApplication(req, res) {
 }
 
 // GET /api/applications
+// GET /api/applications
 async function getAllApplications(req, res) {
   try {
-    const applications = await Application.find().sort({ createdAt: -1 });
+    const {
+      status,
+      jobType,
+      search,
+      sort = "latest",
+      page = 1,
+      limit = 10
+    } = req.query;
+
+    const queryObject = {};
+
+    // Filter by status
+    if (status) {
+      queryObject.status = status;
+    }
+
+    // Filter by jobType
+    if (jobType) {
+      queryObject.jobType = jobType;
+    }
+
+    // Search by company or role
+    if (search) {
+      queryObject.$or = [
+        { company: { $regex: search, $options: "i" } },
+        { role: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    // Sorting
+    let sortOption = { createdAt: -1 };
+
+    if (sort === "oldest") {
+      sortOption = { createdAt: 1 };
+    }
+
+    if (sort === "company") {
+      sortOption = { company: 1 };
+    }
+
+    if (sort === "status") {
+      sortOption = { status: 1 };
+    }
+
+    // Pagination
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const applications = await Application.find(queryObject)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNumber);
+
+    const totalApplications = await Application.countDocuments(queryObject);
 
     res.status(200).json({
       success: true,
       count: applications.length,
+      total: totalApplications,
+      page: pageNumber,
+      totalPages: Math.ceil(totalApplications / limitNumber),
       data: applications
     });
   } catch (error) {

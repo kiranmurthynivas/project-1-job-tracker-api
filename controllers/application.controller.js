@@ -8,7 +8,10 @@ function isInvalidObjectId(id) {
 // POST /api/applications
 async function createApplication(req, res) {
   try {
-    const application = await Application.create(req.body);
+    const application = await Application.create({
+      ...req.body,
+      user: req.user._id
+    });
 
     res.status(201).json({
       success: true,

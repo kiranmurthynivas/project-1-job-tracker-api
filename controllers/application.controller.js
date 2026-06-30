@@ -152,13 +152,16 @@ async function updateApplication(req, res) {
       });
     }
 
-    const application = await Application.findByIdAndUpdate(
-      id,
+      const application = await Application.findOneAndUpdate(
+     {
+      _id: id,
+      user: req.user._id
+    },
       req.body,
-      {
-        new: true,
-        runValidators: true
-      }
+    {
+      new: true,
+      runValidators: true
+    }
     );
 
     if (!application) {
@@ -193,8 +196,10 @@ async function deleteApplication(req, res) {
       });
     }
 
-    const application = await Application.findByIdAndDelete(id);
-
+    const application = await Application.findOneAndDelete({
+      _id: id,
+     user: req.user._id
+    });
     if (!application) {
       return res.status(404).json({
         success: false,

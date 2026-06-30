@@ -39,7 +39,9 @@ async function getAllApplications(req, res) {
       limit = 10
     } = req.query;
 
-    const queryObject = {};
+    const queryObject = {
+       user: req.user._id
+    };
 
     // Filter by status
     if (status) {

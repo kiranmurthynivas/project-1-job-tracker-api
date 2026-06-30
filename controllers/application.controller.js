@@ -116,7 +116,10 @@ async function getApplicationById(req, res) {
       });
     }
 
-    const application = await Application.findById(id);
+    const application = await Application.findOne({
+      _id: id,
+      user: req.user._id
+    });
 
     if (!application) {
       return res.status(404).json({

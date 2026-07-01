@@ -9,6 +9,7 @@ const {
 } = require("../controllers/application.controller");
 
 const { protect } = require("../middleware/auth.middleware");
+const { validateApplication } = require("../middleware/validate.middleware");
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.use(protect);
 router
   .route("/")
   .get(getAllApplications)
-  .post(createApplication);
+  .post(validateApplication, createApplication);
 
 router
   .route("/:id")

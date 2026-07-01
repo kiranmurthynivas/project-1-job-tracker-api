@@ -5,7 +5,6 @@ const applicationRoutes = require("./routes/application.routes");
 const { notFound, errorHandler } = require("./middleware/error.middleware");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const mongoSanitize = require("express-mongo-sanitize");
 const morgan = require("morgan");
 
 const app = express();
@@ -13,7 +12,6 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 
-app.use(mongoSanitize());
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));

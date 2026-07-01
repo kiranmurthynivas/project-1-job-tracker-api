@@ -116,3 +116,14 @@ Build Command: npm ci
 Start Command: npm start
 Health Check Path: /health
 ```
+
+## Deployment
+
+- Deployed backend API on Render
+- Connected production server to MongoDB Atlas
+- Configured environment variables securely
+- Tested deployed API routes using Postman
+- Verified authentication and protected CRUD routes
+
+Live API:
+https://project-1-job-tracker-api.onrender.com

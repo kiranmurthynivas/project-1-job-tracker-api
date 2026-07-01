@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const asyncHandler = require("../utils/asyncHandler");
+const AppError = require("../utils/AppError");
 
 function generateToken(userId) {
   return jwt.sign(
@@ -9,100 +11,63 @@ function generateToken(userId) {
   );
 }
 
-async function registerUser(req, res) {
-  try {
-    const { name, email, password } = req.body;
+const registerUser = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, email and password are required"
-      });
-    }
+  const existingUser = await User.findOne({ email });
 
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "User already exists with this email"
-      });
-    }
-
-    const user = await User.create({
-      name,
-      email,
-      password
-    });
-
-    const token = generateToken(user._id);
-
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      token,
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email
-      }
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message
-    });
+  if (existingUser) {
+    throw new AppError("User already exists with this email", 409);
   }
-}
 
-async function loginUser(req, res) {
-  try {
-    const { email, password } = req.body;
+  const user = await User.create({
+    name,
+    email,
+    password
+  });
 
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required"
-      });
+  const token = generateToken(user._id);
+
+  res.status(201).json({
+    success: true,
+    message: "User registered successfully",
+    token,
+    data: {
+      id: user._id,
+      name: user.name,
+      email: user.email
     }
+  });
+});
 
-    const user = await User.findOne({ email }).select("+password");
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password"
-      });
-    }
+  const user = await User.findOne({ email }).select("+password");
 
-    const isPasswordCorrect = await user.comparePassword(password);
-
-    if (!isPasswordCorrect) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password"
-      });
-    }
-
-    const token = generateToken(user._id);
-
-    res.status(200).json({
-      success: true,
-      message: "Login successful",
-      token,
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email
-      }
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+  if (!user) {
+    throw new AppError("Invalid email or password", 401);
   }
-}
+
+  const isPasswordCorrect = await user.comparePassword(password);
+
+  if (!isPasswordCorrect) {
+    throw new AppError("Invalid email or password", 401);
+  }
+
+  const token = generateToken(user._id);
+
+  res.status(200).json({
+    success: true,
+    message: "Login successful",
+    token,
+    data: {
+      id: user._id,
+      name: user.name,
+      email: user.email
+    }
+  });
+});
 
 module.exports = {
   registerUser,

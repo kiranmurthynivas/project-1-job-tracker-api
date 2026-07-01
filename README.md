@@ -1,72 +1,54 @@
 # Job Application Tracker API
 
 A production-style backend API for tracking job applications.
+Built using Node.js, Express.js, MongoDB, Mongoose, JWT authentication, validation middleware, centralized error handling, and deployed on Render.
 
-## Features
+## Live API
 
-- User registration
-- User login
-- Password hashing with bcrypt
-- JWT authentication
-- Protected routes
-- User-owned job applications
-- CRUD operations
-- Filtering by status and job type
-- Search by company or role
-- Sorting
-- Pagination
-- Centralized error handling
-- Request validation
-- Security middleware
-- Rate limiting
-- MongoDB sanitization
+```txt
+https://project-1-job-tracker-api.onrender.com
+```
 
 ## Tech Stack
 
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT
-- bcryptjs
-- Helmet
-- Morgan
-- express-rate-limit
+* Node.js
+* Express.js
+* MongoDB Atlas
+* Mongoose
+* JWT Authentication
+* bcryptjs
+* Helmet
+* Express Rate Limit
+* Morgan
+* Render Deployment
+* Postman Testing
 
-## API Routes
+## Features
 
-### Auth Routes
+* User registration and login
+* Password hashing using bcryptjs
+* JWT-based authentication
+* Protected application routes
+* User-specific job applications
+* Create, read, update, and delete job applications
+* Filter applications by status and job type
+* Search applications by company or role
+* Sort applications
+* Pagination
+* Centralized error handling
+* Request validation middleware
+* Secure environment variable configuration
+* Production deployment on Render
 
-| Method | Route | Description |
-|---|---|---|
-| POST | `/api/auth/register` | Register user |
-| POST | `/api/auth/login` | Login user |
+## API Base URL
 
-### Application Routes
-
-All application routes require Bearer token.
-
-| Method | Route | Description |
-|---|---|---|
-| GET | `/api/applications` | Get logged-in user's applications |
-| POST | `/api/applications` | Create application |
-| GET | `/api/applications/:id` | Get one application |
-| PATCH | `/api/applications/:id` | Update application |
-| DELETE | `/api/applications/:id` | Delete application |
-
-## Query Features
-
-```text
-GET /api/applications?status=Applied
-GET /api/applications?jobType=Internship
-GET /api/applications?search=react
-GET /api/applications?sort=oldest
-GET /api/applications?page=1&limit=5
+```txt
+https://project-1-job-tracker-api.onrender.com
 ```
 
 ## Environment Variables
 
-Create a `.env` file in the root directory and add the following variables:
+Create a `.env` file locally:
 
 ```env
 PORT=5000
@@ -76,7 +58,13 @@ JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=7d
 ```
 
-Use `.env.example` as the local template. Do not commit `.env`.
+Example file included:
+
+```txt
+.env.example
+```
+
+Never commit the real `.env` file.
 
 ## Run Locally
 
@@ -92,38 +80,117 @@ Start the development server:
 npm run dev
 ```
 
-## Server
+Server runs locally at:
 
 ```txt
 http://localhost:5000
 ```
 
-## Deploy on Render
+## API Routes
 
-This repo includes a Render Blueprint at `render.yaml`.
+### Health
 
-1. Commit and push this repository to GitHub.
-2. In the Render Dashboard, choose **New > Blueprint** and connect this repository.
-3. Render will create the Node web service from `render.yaml`.
-4. When Render prompts for environment variables, set `MONGO_URL` to your MongoDB connection string. `JWT_SECRET` is generated automatically.
-5. After the deploy finishes, verify the service at `/health`.
+| Method | Route     | Description  |
+| ------ | --------- | ------------ |
+| GET    | `/`       | Root route   |
+| GET    | `/health` | Health check |
 
-Manual web service settings, if you do not use the Blueprint:
+### Auth
+
+| Method | Route                | Description                  |
+| ------ | -------------------- | ---------------------------- |
+| POST   | `/api/auth/register` | Register a user              |
+| POST   | `/api/auth/login`    | Login user and get JWT token |
+
+### Applications
+
+Protected routes require:
 
 ```txt
-Language: Node
-Build Command: npm ci
-Start Command: npm start
-Health Check Path: /health
+Authorization: Bearer <token>
+```
+
+| Method | Route                   | Description               |
+| ------ | ----------------------- | ------------------------- |
+| POST   | `/api/applications`     | Create job application    |
+| GET    | `/api/applications`     | Get all user applications |
+| GET    | `/api/applications/:id` | Get single application    |
+| PATCH  | `/api/applications/:id` | Update application        |
+| DELETE | `/api/applications/:id` | Delete application        |
+
+## Filtering, Search, Sorting, Pagination
+
+| Feature            | Example                               |
+| ------------------ | ------------------------------------- |
+| Filter by status   | `/api/applications?status=Applied`    |
+| Filter by job type | `/api/applications?jobType=Full-time` |
+| Search             | `/api/applications?search=google`     |
+| Sort by oldest     | `/api/applications?sort=oldest`       |
+| Sort by company    | `/api/applications?sort=company`      |
+| Pagination         | `/api/applications?page=1&limit=5`    |
+
+## Example Register Request
+
+```http
+POST /api/auth/register
+```
+
+```json
+{
+  "name": "Kiran",
+  "email": "kiran@test.com",
+  "password": "password123"
+}
+```
+
+## Example Login Request
+
+```http
+POST /api/auth/login
+```
+
+```json
+{
+  "email": "kiran@test.com",
+  "password": "password123"
+}
+```
+
+## Example Create Application Request
+
+```http
+POST /api/applications
+```
+
+```json
+{
+  "company": "Google",
+  "role": "Backend Developer",
+  "status": "Applied",
+  "jobType": "Full-time",
+  "location": "Bangalore",
+  "salary": 1200000,
+  "notes": "Applied through careers page"
+}
+```
+
+## Postman Collection
+
+Postman collection and environment are available inside the `docs/` folder.
+
+```txt
+docs/job-tracker-api.postman_collection.json
+docs/job-tracker-api.postman_environment.json
 ```
 
 ## Deployment
 
-- Deployed backend API on Render
-- Connected production server to MongoDB Atlas
-- Configured environment variables securely
-- Tested deployed API routes using Postman
-- Verified authentication and protected CRUD routes
+The backend is deployed on Render and connected to MongoDB Atlas.
 
-Live API:
-https://project-1-job-tracker-api.onrender.com
+Deployment proof:
+
+* Render build successful
+* MongoDB Atlas connected successfully
+* Live API tested using Postman
+* Auth and protected CRUD routes verified
+* Filtering, search, sorting, and pagination tested
